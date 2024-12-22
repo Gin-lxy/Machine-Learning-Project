@@ -2,6 +2,7 @@ import torch
 import librosa
 import numpy as np
 from torch import nn
+import os
 
 class PositionalEncoding(nn.Module):
     def __init__(self, d_model, max_len=5000):
@@ -113,6 +114,10 @@ class StoryPredictor:
         预测故事的真实性
         返回: (预测结果, 置信度)
         """
+        # 确保音频路径使用正确的目录
+        if not audio_path.startswith('test_dataset'):
+            audio_path = os.path.join('test_dataset', audio_path)
+            
         # 处理音频
         features = self.process_audio(audio_path)
         if features is None:
@@ -148,13 +153,12 @@ def predict_batch(predictor, audio_files):
         })
     return results
 
-# 使用示例
 def main():
     # 初始化预测器
     predictor = StoryPredictor('best_model.pth')
     
     # 单个文件预测
-    audio_path = "test_audio.wav"  # 替换为你的音频文件路径
+    audio_path = "00003.wav"  # 现在只需要提供文件名，路径会自动添加
     prediction, confidence = predictor.predict(audio_path)
     
     if prediction is not None:
